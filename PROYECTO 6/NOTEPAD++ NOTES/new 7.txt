@@ -1,0 +1,42 @@
+Trabajando con los datos de la tienda Four `name_store` escribe una consulta para calcular el cambio en los ingresos totales
+en cada categoria y en la tienda en general despues de la venta de cada producto el 2 de Junio de 2019
+
+SELECT
+    name_store AS store_name,
+    category AS category,
+    name AS product_name,
+    price,
+    SUM(price) OVER (
+        PARTITION BY 
+            category
+		ORDER BY  
+            id_product
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS category_accum,
+    SUM(price) OVER (
+        ORDER BY
+            id_product
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)  AS store_accum
+FROM
+    products_data_all
+WHERE
+    date_upd = '2019-06-02'
+    AND name_store = 'Four'
+ORDER BY
+    id_product;
+-------------------------------------------------------------------------------------------------------------------------------
+Escribe una consulta que clasifique el precio de cada tienda `name_store` y categoria el 2 de junio. Imprime el nombre 
+del producto y suprecio antes de la columna que contiene la posicion del producto dentro del grupo.
+
+SELECT DISTINCT
+    name_store AS store_name,
+    category AS category,
+    date_upd::date AS sale_date,
+    name,
+    price,
+    RANK() OVER (PARTITION BY name_store, category ORDER BY price) AS rank
+FROM
+    products_data_all
+WHERE
+    date_upd::date = '2019-06-02'
+ORDER BY
+    store_name, category, rank;

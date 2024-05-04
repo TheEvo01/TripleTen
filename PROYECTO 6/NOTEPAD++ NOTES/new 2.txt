@@ -1,0 +1,50 @@
+encontrar la cantidad de productos en cada categoria para la fecha X. ordena los datos en orden ascendente.
+
+SELECT 
+    date_upd::date AS update_date,
+    category,
+    COUNT(*) AS name_cnt
+FROM
+    products_data_all
+WHERE
+    date_upd::date = '2019-06-05'
+GROUP BY
+    update_date,
+    category
+ORDER BY
+    name_cnt;
+------------------------------------------------------------------------------------------------------------------------------
+Escribe una consulta para calcular la cantidad de productos unicos para cada categoria en la tienda `T-E-B` para la fecha X
+
+SELECT 
+    date_upd::date AS update_date,
+    name_store,
+    category,
+    COUNT(DISTINCT name) AS uniq_name_cnt
+FROM
+    products_data_all
+WHERE
+    date_upd::date = '2019-06-30'
+    AND name_store = 'T-E-B'
+GROUP BY
+    update_date,
+    name_store,
+    category
+ORDER BY
+    uniq_name_cnt DESC;
+-------------------------------------------------------------------------------------------------------------------------------
+Escribe una consulta para imprimir los 5 productos mas caros en orden descendente
+
+SELECT 
+    name,
+    MAX(price) AS max_price
+FROM
+    products_data_all
+GROUP BY
+    name
+ORDER BY
+    max_price DESC
+LIMIT 5;
+-------------------------------------------------------------------------------------------------------------------------------
+
+

@@ -1,0 +1,218 @@
+Encuentra el número total de productos y el número de productos únicos para cada transacción. Imprime 10 filas que 
+contengan números de transacción, el número de productos comprados y el número de productos únicos en cada compra.
+
+SELECT
+    transactions.id_transaction AS id_transaction,
+    COUNT(products.name) AS name_cnt,
+    COUNT(DISTINCT products.name) AS name_uniq_cnt
+FROM
+    transactions
+INNER JOIN
+    products ON transactions.id_product = products.id_product
+GROUP BY
+    transactions.id_transaction
+LIMIT 10;
+*************************************************************************************************************************
+Averigua qué transacciones incluyeron productos no únicos (más de un producto del mismo tipo). Muestra el número de 
+transacción, el número de productos y el número de productos únicos.
+
+SELECT
+    transactions.id_transaction AS id_transaction,
+    COUNT(products.name) AS name_cnt,
+    COUNT(DISTINCT products.name) AS name_uniq_cnt
+FROM
+    transactions
+INNER JOIN
+    products ON transactions.id_product = products.id_product
+GROUP BY
+    transactions.id_transaction
+HAVING
+    COUNT(products.name) != COUNT(DISTINCT products.name);
+***************************************************************************************************************************
+Encuentra cuántas transacciones se realizaron en días lluviosos o soleados. Crea una tabla con los campos precipitación 
+(rain) y el número de transacciones (uniq_transactions).
+
+SELECT
+    weather.rain,
+    COUNT(DISTINCT transactions.id_transaction) AS uniq_transactions
+FROM
+    weather
+INNER JOIN
+    transactions ON CAST(weather.date AS date) = CAST(transactions.date AS date)
+GROUP BY
+    weather.rain;	
+*****************************************************************************************************************************
+Muestra la temperatura del aire y el número de transacciones. Ordena los resultados por la fecha en el orden ascendente 
+(el primero va primero).
+
+SELECT
+    CAST(weather.date AS date) AS date,
+    weather.temp AS temp,
+    COUNT(DISTINCT transactions.id_transaction) AS uniq_transactions
+FROM
+    weather
+LEFT JOIN
+    transactions ON CAST(weather.date AS date) = CAST(transactions.date AS date)
+GROUP BY
+    CAST(weather.date AS date), weather.temp
+ORDER BY
+    CAST(weather.date AS date) ASC;	
+*******************************************************************************************************************************
+Para cada transacción, encuentra el precio total de compra así como el número de productos comprados.
+
+SELECT
+    transactions.id_transaction,
+    SUM(products_stores.price) AS total,
+    COUNT(products_stores.id_product) AS amount
+FROM
+    transactions
+LEFT JOIN
+    products_stores ON CAST(products_stores.date_upd AS date) = CAST(transactions.date AS date)
+                     AND products_stores.id_product = transactions.id_product
+                     AND products_stores.id_store = transactions.id_store
+GROUP BY
+    transactions.id_transaction
+HAVING
+    SUM(products_stores.price) > 35;
+*********************************************************************************************************************************
+Escribe una consulta para seleccionar los nombres de todos los productos que se compraron al menos una vez el 1 de junio de 2019.
+
+SELECT DISTINCT
+    products.name
+FROM
+    products
+LEFT JOIN (
+    SELECT
+        id_product
+    FROM
+        transactions
+    WHERE
+        CAST(transactions.date AS date) = '2019-06-01'
+) AS subq ON products.id_product = subq.id_product
+WHERE
+    subq.id_product IS NOT NULL;
+***********************************************************************************************************************************
+Escribe una consulta para seleccionar los nombres de todos los productos que se compraron al menos una vez el 8 de junio de 2019.
+
+SELECT DISTINCT
+    products.name
+FROM
+    products
+LEFT JOIN (
+    SELECT
+        id_product
+    FROM
+        transactions
+    WHERE
+        CAST(transactions.date AS date) = '2019-06-08'
+) AS subq ON products.id_product = subq.id_product
+WHERE
+    subq.id_product IS NOT NULL;
+*************************************************************************************************************************************
+Une los datos obtenidos de las consultas anteriores en una selección sin que se dupliquen los valores name.
+
+SELECT name FROM (
+    SELECT DISTINCT
+        products.name AS name
+    FROM
+        products
+        LEFT JOIN (
+            SELECT
+                id_product
+            FROM
+                transactions
+            WHERE
+                CAST(transactions.date AS date) = '2019-06-01'
+        ) AS SUBQ1 ON products.id_product = SUBQ1.id_product
+    WHERE
+        SUBQ1.id_product IS NOT NULL
+
+    UNION
+
+    SELECT DISTINCT
+        products.name AS name
+    FROM
+        products
+        LEFT JOIN (
+            SELECT
+                id_product
+            FROM
+                transactions
+            WHERE
+                CAST(transactions.date AS date) = '2019-06-08'
+        ) AS SUBQ2 ON products.id_product = SUBQ2.id_product
+    WHERE
+        SUBQ2.id_product IS NOT NULL
+) AS combined_names;
+***************************************************************************************************************************************
+Convierte la consulta de la tarea anterior en una subconsulta y llámala SUBQ. Pasa name desde SUBQ a la consulta externa y encuentra 
+la longitud de la lista de productos resultante (es decir, el número de productos diferentes vendidos el 1 y el 8 de junio).
+
+SELECT COUNT(name) AS product_count
+FROM (
+    SELECT DISTINCT
+        products.name AS name
+    FROM
+        products
+    LEFT JOIN (
+        SELECT
+            id_product
+        FROM
+            transactions
+        WHERE
+            CAST(transactions.date AS date) = '2019-06-01') AS SUBQ1 ON products.id_product = SUBQ1.id_product
+    WHERE
+        SUBQ1.id_product IS NOT NULL
+    UNION
+    SELECT DISTINCT
+        products.name AS name
+    FROM
+        products
+    LEFT JOIN (
+        SELECT
+            id_product
+        FROM
+            transactions
+        WHERE
+            CAST(transactions.date AS date) = '2019-06-08') AS SUBQ2 ON products.id_product = SUBQ2.id_product
+    WHERE
+        SUBQ2.id_product IS NOT NULL
+) AS SUBQ;
+*****************************************************************************************************************************************
+Fusiona las consultas de los bloques anteriores con UNION ALL y conviértela en una subconsulta con el nombre SUBQ.
+
+SELECT COUNT(name) AS total_products
+FROM (
+    SELECT DISTINCT
+        products.name AS name
+    FROM
+        products
+    LEFT JOIN (
+        SELECT
+            id_product
+        FROM
+            transactions
+        WHERE
+            CAST(transactions.date AS date) = '2019-06-01'
+    ) AS SUBQ1 ON products.id_product = SUBQ1.id_product
+    WHERE
+        SUBQ1.id_product IS NOT NULL
+    
+    UNION ALL
+    
+    SELECT DISTINCT
+        products.name AS name
+    FROM
+        products
+    LEFT JOIN (
+        SELECT
+            id_product
+        FROM
+            transactions
+        WHERE
+            CAST(transactions.date AS date) = '2019-06-08'
+    ) AS SUBQ2 ON products.id_product = SUBQ2.id_product
+    WHERE
+        SUBQ2.id_product IS NOT NULL
+) AS SUBQ;
+******************************************************************************************************************************************

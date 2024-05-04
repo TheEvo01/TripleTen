@@ -1,0 +1,47 @@
+Recupera las horas del campo `date` en la tabla `transactions`
+
+SELECT 
+    EXTRACT(HOUR FROM date) AS hours
+FROM
+    transactions;
+-----------------------------------------------------------------------------------------------------------------
+Recupera las horas del campo `date` en la tabla `transactions`. Agrupa los datos por `hours` y 
+encuentra la cantidad de productos comprados cada hora. Ordena los resultados en orden ascendente.
+
+SELECT 
+    EXTRACT(HOUR FROM date) AS hours,
+    COUNT(id_product) AS cnt
+FROM
+    transactions
+GROUP BY
+    hours
+ORDER BY
+    hours ASC;
+------------------------------------------------------------------------------------------------------------------
+Recupera las dias del campo `date` en la tabla `transactions`. Agrupa los datos por `days` y 
+encuentra la cantidad de productos comprados cada dia. Ordena los resultados en orden ascendente por `days`.
+
+SELECT 
+    EXTRACT(DAY FROM date) AS days,
+    COUNT(id_product) AS cnt
+FROM
+    transactions
+GROUP BY
+    days
+ORDER BY
+    days ASC;
+-------------------------------------------------------------------------------------------------------------------
+Has determinado que la mayoria de las compras se hicieron el primer dia del mes. Trunca la fecha del campo `date` 
+al nivel de dia y llama a la variable `date_month`. Agrupa los datos por fecha truncada y encuentra la cantidad de productos
+se compran por cada dia. Ordena de manera ascendente por `date_month`
+
+SELECT 
+    DATE_TRUNC('day', date) AS date_month,
+    COUNT(id_product) AS cnt
+FROM
+    transactions
+GROUP BY
+    date_month
+ORDER BY
+    date_month ASC;
+---------------------------------------------------------------------------------------------------------------------	
