@@ -1,0 +1,106 @@
+Crea una nueva característica llamada price_class. Para precios mayores a $113 000, asigna price_class a 1. 
+Para precios menores o iguales a $113 000, asigna 'price_class' a 0.
+
+import pandas as pd
+
+df = pd.read_csv('/datasets/train_data_us.csv')
+
+# Creamos la nueva característica 'price_class' basada en la condición
+df.loc[df['last_price'] > 113000, 'price_class'] = 1
+df.loc[df['last_price'] <= 113000, 'price_class'] = 0
+
+print(df.head())
+*******************************************************************************************************************
+Muchas librerías de machine learning requieren que las características se almacenen en variables separadas. 
+Declara dos variables: features para características / target para objetivo
+
+import pandas as pd
+
+df = pd.read_csv('/datasets/train_data_us.csv')
+
+df.loc[df['last_price'] > 113000, 'price_class'] = 1
+df.loc[df['last_price'] <= 113000, 'price_class'] = 0
+
+features = df.drop(['last_price', 'price_class'], axis=1)
+target = df['price_class']
+
+print(features.shape)
+print(target.shape)
+********************************************************************************************************************
+Comencemos con el entrenamiento del modelo. En la Lección 5 guardamos el conjunto de datos de entrenamiento en 
+las variables features y target. Para iniciar el entrenamiento, llama al método fit() y pásale tus variables 
+como argumento.
+
+import pandas as pd
+from sklearn import set_config
+
+# no cambies estos parámetros de configuración
+set_config(print_changed_only=False)
+
+# importa el árbol de decisión de la librería sklearn
+from sklearn.tree import DecisionTreeClassifier 
+# < escribe tu código aquí >
+model = DecisionTreeClassifier() 
+
+df = pd.read_csv('/datasets/train_data_us.csv')
+
+df.loc[df['last_price'] > 113000, 'price_class'] = 1
+df.loc[df['last_price'] <= 113000, 'price_class'] = 0
+
+features = df.drop(['last_price', 'price_class'], axis=1)
+target = df['price_class']
+
+# crea un modelo vacío y asígnalo a una variable
+# entrena un modelo llamando al método fit()
+# < escribe tu código aquí >
+model.fit(features, target) 
+
+print(model)
+************************************************************************************************************************
+Ahora tenemos un modelo entrenado en la variable model . Para predecir respuestas, llama al método predict() 
+y pásale la tabla con las características de las nuevas observaciones.
+
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+
+df = pd.read_csv('/datasets/train_data_us.csv')
+
+df.loc[df['last_price'] > 113000, 'price_class'] = 1
+df.loc[df['last_price'] <= 113000, 'price_class'] = 0
+
+features = df.drop(['last_price', 'price_class'], axis=1)
+target = df['price_class']
+
+model = DecisionTreeClassifier()
+
+model.fit(features, target)
+
+new_features = pd.DataFrame(
+    [
+        [None, None, 2.8, 25, None, 25, 0, 0, 0, None, 0, 30706.0, 7877.0],
+        [None, None, 2.75, 25, None, 25, 0, 0, 0, None, 0, 36421.0, 9176.0]
+    ],
+    columns=features.columns
+)
+
+# completa la tabla con las nuevas características
+new_features.loc[0, 'total_area'] = 900.0
+# < escribe tu código aquí > 
+
+# predice respuestas y muestra el resultado en la pantalla
+# < escribe tu código aquí >
+# Completa las características del primer apartamento
+new_features.loc[0, 'total_area'] = 900.0
+new_features.loc[0, 'bedrooms'] = 12
+new_features.loc[0, 'living_area'] = 409.7
+new_features.loc[0, 'kitchen_area'] = 112.0
+
+# Completa las características del segundo apartamento
+new_features.loc[1, 'total_area'] = 109.0
+new_features.loc[1, 'bedrooms'] = 2
+new_features.loc[1, 'living_area'] = 32.0
+new_features.loc[1, 'kitchen_area'] = 40.5
+
+answers = model.predict(new_features)
+print(answers)
+***************************************************************************************************************************

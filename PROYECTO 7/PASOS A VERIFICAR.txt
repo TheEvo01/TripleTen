@@ -1,0 +1,6 @@
+Asegúrate de revisar esta lista de verificación:
+[ ] Jupyter Notebook se puede iniciar.
+[ ] Python 3.7 está instalado. Verifica la versión: import sys;
+print(sys.version)
+[ ] El comando importar sklearn se ejecuta con éxito (todo funciona incluso si no hay respuesta).
+[ ] El comando import joblib se ejecuta con éxito (todo funciona incluso si no hay respuesta).
